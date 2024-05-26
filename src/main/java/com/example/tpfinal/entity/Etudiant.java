@@ -1,5 +1,7 @@
 package com.example.tpfinal.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -20,14 +22,14 @@ public class Etudiant {
 
     @ManyToOne
     @JoinColumn(name = "departement_id")
+    @JsonBackReference
     private Departement departement;
 
-    @ManyToOne
-    @JoinColumn(name = "equipe_id")
-    private Equipe equipe;
+    @ManyToMany(mappedBy = "etudiants")
+    private List<Equipe> equipes;
 
-
-    @OneToMany(mappedBy = "etudiant")
+    @OneToMany(mappedBy = "etudiant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Contrat> contrats;
 
     // Getters and Setters
@@ -71,12 +73,12 @@ public class Etudiant {
         this.departement = departement;
     }
 
-    public Equipe getEquipe() {
-        return equipe;
+    public List<Equipe> getEquipes() {
+        return equipes;
     }
 
-    public void setEquipe(Equipe equipe) {
-        this.equipe = equipe;
+    public void setEquipes(List<Equipe> equipes) {
+        this.equipes = equipes;
     }
 
     public List<Contrat> getContrats() {

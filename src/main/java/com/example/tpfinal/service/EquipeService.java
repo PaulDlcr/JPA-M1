@@ -1,9 +1,11 @@
 package com.example.tpfinal.service;
 
 import com.example.tpfinal.entity.Contrat;
+import com.example.tpfinal.entity.DetailEquipe;
 import com.example.tpfinal.entity.Equipe;
 import com.example.tpfinal.entity.Etudiant;
 import com.example.tpfinal.repository.ContratRepository;
+import com.example.tpfinal.repository.DetailEquipeRepository;
 import com.example.tpfinal.repository.EquipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ public class EquipeService {
     private EquipeRepository equipeRepository;
 
     @Autowired
-    private ContratRepository contratRepository;
+    private DetailEquipeRepository detailEquipeRepository;
 
     public List<Equipe> getAllEquipes() {
         return equipeRepository.findAll();
@@ -30,6 +32,9 @@ public class EquipeService {
     }
 
     public Equipe createEquipe(Equipe equipe) {
+        if (equipe.getDetailEquipe() != null) {
+            detailEquipeRepository.save(equipe.getDetailEquipe());
+        }
         return equipeRepository.save(equipe);
     }
 
@@ -38,6 +43,23 @@ public class EquipeService {
         if (equipe != null) {
             equipe.setNomEquipe(equipeDetails.getNomEquipe());
             equipe.setNiveau(equipeDetails.getNiveau());
+
+            if (equipeDetails.getDetailEquipe() != null) {
+                DetailEquipe detailEquipe = equipeDetails.getDetailEquipe();
+                if (detailEquipe.getIdDetailEquipe() == null) {
+                    detailEquipeRepository.save(detailEquipe);
+                } else {
+                    DetailEquipe existingDetail = detailEquipeRepository.findById(detailEquipe.getIdDetailEquipe()).orElse(null);
+                    if (existingDetail != null) {
+                        existingDetail.setSalle(detailEquipe.getSalle());
+                        existingDetail.setThematique(detailEquipe.getThematique());
+                        detailEquipeRepository.save(existingDetail);
+                    } else {
+                        detailEquipeRepository.save(detailEquipe);
+                    }
+                }
+            }
+
             return equipeRepository.save(equipe);
         }
         return null;

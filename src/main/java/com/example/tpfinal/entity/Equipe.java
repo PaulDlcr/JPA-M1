@@ -14,15 +14,19 @@ public class Equipe {
     @Enumerated(EnumType.STRING)
     private Niveau niveau;
 
-    @OneToOne
-    @JoinColumn(name = "detail_equipe_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "detail_equipe_id", referencedColumnName = "idDetailEquipe")
     private DetailEquipe detailEquipe;
 
-    @OneToMany(mappedBy = "equipe")
+    @ManyToMany
+    @JoinTable(
+            name = "etudiant_equipe",
+            joinColumns = @JoinColumn(name = "equipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "etudiant_id")
+    )
     private List<Etudiant> etudiants;
 
     // Getters and Setters
-
     public Integer getIdEquipe() {
         return idEquipe;
     }
@@ -62,6 +66,4 @@ public class Equipe {
     public void setEtudiants(List<Etudiant> etudiants) {
         this.etudiants = etudiants;
     }
-
 }
-
